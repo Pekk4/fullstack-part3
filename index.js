@@ -25,17 +25,22 @@ let persons = [
   }
 ]
 
-app.use(express.json())
-app.use(morgan('tiny'))
+morgan.token('content', request => (JSON.stringify(request.body)))
+const format =
+  ':method :url :status :res[content-length] - ' +
+  ':response-time ms :content'
 
-app.get('/info', (request, response) => {
+app.use(express.json())
+app.use(morgan(format))
+
+app.get('/info', (_, response) => {
   response.send(
     `<p>Phonebook has info for ${persons.length} people</p>`+
     `<p>${new Date()}</p>`
   )
 })
 
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (_, response) => {
   response.json(persons)
 })
 
