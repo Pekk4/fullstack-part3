@@ -1,29 +1,8 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
-
-let persons = [
-  { 
-      "name": "Arto Hellas", 
-      "number": "040-123456",
-      "id": 1
-  },
-  { 
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523",
-      "id": 2
-  },
-  { 
-      "name": "Dan Abramov", 
-      "number": "12-43-234345",
-      "id": 3
-  },
-  { 
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122",
-      "id": 4
-  }
-]
+const Record = require('./models/record')
 
 morgan.token('content', request => (JSON.stringify(request.body)))
 const format =
@@ -42,7 +21,9 @@ app.get('/info', (_, response) => {
 })
 
 app.get('/api/persons', (_, response) => {
-  response.json(persons)
+  Record.find({}).then(records => {
+    response.json(records)
+  })
 })
 
 app.get('/api/persons/:id', (request, response) => {
