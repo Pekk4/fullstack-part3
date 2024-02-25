@@ -47,7 +47,6 @@ app.delete('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
   const body = request.body
-  const match = persons.find(person => person.name === body.name)
 
   if (!body.name) {
     return response.status(400).json({
@@ -58,21 +57,20 @@ app.post('/api/persons', (request, response) => {
       error: 'number missing'
     })
   }
-  if (match !== undefined) {
-    return response.status(409).json({
-      error: 'name must be unique'
-    })
-  }
+  //if (match !== undefined) {
+  //  return response.status(409).json({
+  //    error: 'name must be unique'
+  //  })
+  //}
 
-  const person = {
+  const person = new Record({
     name: body.name,
     number: body.number,
-    id: Math.floor(Math.random() * 100000),
-  }
+  })
 
-  persons = persons.concat(person)
-
-  response.json(person)
+  person.save().then(savedRecord => {
+    response.json(savedRecord)
+  })
 })
 
 const PORT = process.env.PORT || 3001
