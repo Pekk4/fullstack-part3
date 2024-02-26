@@ -20,10 +20,12 @@ app.get('/info', (_, response) => {
   )
 })
 
-app.get('/api/persons', (_, response) => {
-  Record.find({}).then(records => {
-    response.json(records)
-  })
+app.get('/api/persons', (_, response, next) => {
+  Record.find({})
+    .then(records => {
+      response.json(records)
+    })
+    .catch(error => next(error))
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -37,15 +39,16 @@ app.get('/api/persons/:id', (request, response) => {
   }
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Record.findByIdAndDelete(request.params.id)
     .then(result => {
       console.log(result)
       response.status(204).end()
     })
+    .catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
   if (!body.name) {
@@ -68,10 +71,30 @@ app.post('/api/persons', (request, response) => {
     number: body.number,
   })
 
-  person.save().then(savedRecord => {
-    response.json(savedRecord)
-  })
+  person.save()
+    .then(savedRecord => {
+      response.json(savedRecord)
+    })
+    .catch(error => next(error))
 })
+
+const unknownEndpoint = (_, response) => {
+  response.status(404).send({ error: 'Unknown endpoint' })
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, _, response, next) => {
+  console.log(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'Malformatted id' })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
