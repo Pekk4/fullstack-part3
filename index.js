@@ -13,11 +13,15 @@ app.use(express.static('./puhelinluettelo/build'))
 app.use(express.json())
 app.use(morgan(format))
 
-app.get('/info', (_, response) => {
-  response.send(
-    `<p>Phonebook has info for ${persons.length} people</p>`+
-    `<p>${new Date()}</p>`
-  )
+app.get('/info', (_, response, next) => {
+  Record.find({})
+    .then(records => {
+      response.send(
+        `<p>Phonebook has info for ${records.length} people</p>`+
+        `<p>${new Date()}</p>`
+      )
+    })
+    .catch(error => next(error))
 })
 
 app.get('/api/persons', (_, response, next) => {
@@ -28,15 +32,12 @@ app.get('/api/persons', (_, response, next) => {
     .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (request, response) => {
-  const id = Number(request.params.id)
-  const person = persons.find(person => person.id === id)
-
-  if (person) {
-    response.json(person)
-  } else {
-    response.status(404).end()
-  }
+app.get('/api/persons/:id', (request, response, next) => {
+  Record.findById(request.params.id)
+    .then(result => {
+      response.json(result)
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -60,11 +61,6 @@ app.post('/api/persons', (request, response, next) => {
       error: 'number missing'
     })
   }
-  //if (match !== undefined) {
-  //  return response.status(409).json({
-  //    error: 'name must be unique'
-  //  })
-  //}
 
   const person = new Record({
     name: body.name,
@@ -83,7 +79,7 @@ app.put('/api/persons/:id', (request, response, next) => {
 
   const person = {
     name: body.name,
-    number: body.name,
+    number: body.number,
   }
 
   Record.findByIdAndUpdate(request.params.id, person, { new: true })
