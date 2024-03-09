@@ -42,8 +42,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 app.delete('/api/persons/:id', (request, response, next) => {
   Record.findByIdAndDelete(request.params.id)
-    .then(result => {
-      console.log(result)
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -82,7 +81,11 @@ app.put('/api/persons/:id', (request, response, next) => {
     number: body.number,
   }
 
-  Record.findByIdAndUpdate(request.params.id, person, { new: true })
+  Record.findByIdAndUpdate(
+    request.params.id,
+    person,
+    { new: true, runValidators: true, context: 'query' }
+  )
     .then(updatedRecord => {
       response.json(updatedRecord)
     })

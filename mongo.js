@@ -8,7 +8,7 @@ if (process.argv.length<3) {
 const password = process.argv[2]
 const url =
   `mongodb+srv://fullstack3:${password}` +
-  `@fullstack3.ujaoa46.mongodb.net/?retryWrites=true&w=majority`
+  '@fullstack3.ujaoa46.mongodb.net/?retryWrites=true&w=majority'
 
 mongoose.set('strictQuery', false)
 mongoose.connect(url)
@@ -26,14 +26,14 @@ if (process.argv.length > 3) {
     name: process.argv[3],
     number: process.argv[4],
   })
-      
+
   record.save().then(result => {
     console.log(`New record saved: ${result}`)
     mongoose.connection.close()
   })
 } else {
   Record.find({}).then(result => {
-    console.log("Phonebook's records:\n")
+    console.log('Phonebook\'s records:\n')
     result.forEach(record => {
       console.log(`${record.name} ${record.number}`)
     })
