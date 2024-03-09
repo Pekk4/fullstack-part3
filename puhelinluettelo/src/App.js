@@ -67,6 +67,9 @@ const App = () => {
         .then(() => {
           notifyOnChange(`Added ${newName}`)
         })
+        .catch(error => {
+          notifyOnChange(error.response.data.error, true)
+        })
     }
 
     setNewName('')
