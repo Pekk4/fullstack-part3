@@ -17,3 +17,5 @@ graph TD
     D --> E
 
 ```
+
+Deploy script builds the latest frontend version.
