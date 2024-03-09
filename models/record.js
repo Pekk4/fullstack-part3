@@ -20,7 +20,16 @@ const recordSchema = new mongoose.Schema({
     minlength: 3,
     required: true
   },
-  number: String,
+  number: {
+    type: String,
+    validate: {
+      validator: function(v) {
+        return /^(\d{2}-\d{5,}|\d{3}-\d{4,})$/.test(v);
+      },
+      message: props => `${props.value} is not a valid number format!`
+    },
+    required: [true, 'Valid phone number is required!']
+  },
 })
 
 recordSchema.set('toJSON', {
